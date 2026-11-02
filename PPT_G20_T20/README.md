@@ -1,4 +1,4 @@
-# Nhóm 20 — Đề tài 20 — Thời điểm đạt chỉ số tải tích lũy — Minh chứng Tuần 1
+# Nhóm 20 — Đề tài 20 — Thời điểm đạt chỉ số tải tích lũy
 
 Đề tài: cho hàm tải y(t) (số xe hiện diện theo thời gian), tìm thời điểm T sao cho tích phân tích lũy
 I(T) = ∫ y(t) dt từ đầu đoạn đến T đạt ngưỡng Q (25%, 50%, 75% tổng tải của đoạn).
