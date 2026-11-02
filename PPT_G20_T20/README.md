@@ -137,9 +137,8 @@ nên mọi kết quả phải ghi là sơ bộ. Đây là cảnh báo có chủ 
 7. **Các điểm đang chờ giảng viên xác nhận** (nhóm tạm giả định như trên): lưới gốc là timestamp thật; "mỗi 2/4 mốc"
    là bước 2 và 4; cách thêm mốc cuối; hàm bổ sung để đo bậc hội tụ; các mức dung sai khảo sát.
 
-## 7. Kế hoạch phần tính toán (chưa có trong gói Tuần 1)
+## 7. Kế hoạch phần tính toán
 
-Các bước dưới đây là kế hoạch, chưa có kết quả trong gói này:
 
     h_i = t_(i+1) − t_i
     ỹ(t): nội suy tuyến tính từng đoạn qua các điểm (t_i, y_i)
