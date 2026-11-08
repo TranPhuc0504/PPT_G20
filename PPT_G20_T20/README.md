@@ -10,7 +10,7 @@ Gói này gồm hai giai đoạn:
 - **Tuần 1:** chọn, kiểm tra hai đoạn A/B và chuẩn bị dữ liệu (`check_input.py`, `data_prep.py`).
 - **Tuần 2:** phần tính toán chính — tích phân hình thang, chia đôi, kiểm chứng trên hàm biết nghiệm đúng, bảng sai số
   MAE/RMSE/E_inf, bậc hội tụ p, khảo sát làm thưa lưới và dung sai (`integrate.py`, `bisection.py`, `validate.py`,
-  `experiments.py`). Phần còn thiếu nằm ở mục 7.5. Đây chưa phải hồ sơ hoàn chỉnh của phần Phương pháp tính 6 điểm.
+  `experiments.py`).
 
 ### Nộp Tuần 2 (script kiểm chứng và bảng sai số)
 
@@ -209,9 +209,7 @@ Dữ liệu A/B không có nghiệm đúng, nên lưới gốc f1 (dung sai rấ
 - Làm thưa lưới (f2, f4, Q giữ nguyên từ f1): đo lệch |T(f) − T(f1)| bằng MAE, RMSE, E_inf; bậc hội tụ thực nghiệm p = log2(E_f4 / E_f2) (E_h ứng với f4, E_{h/2} ứng với f2); vì dữ liệu thật không trơn nên p chỉ mang tính chỉ báo.
 - Dung sai: so T(tol) với T(10^-12) trên cùng lưới f1; độ lệch phải ≤ tol. Độ lệch do lấy mẫu thường lớn hơn nhiều độ lệch do dung sai.
 
-### 7.5. Còn thiếu
 
-`src/make_figures.py` (đồ thị tích lũy và giao mức Q, đúng đơn vị), `report.pdf`, `slides.pdf`, `contributions.csv`; chạy lại toàn bộ khi có snapshot nghiệm thu.
 
 ## 8. Cách chạy
 
