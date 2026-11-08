@@ -27,7 +27,7 @@ này là **SƠ BỘ**, không phải ground truth. Không tự đổi trạng th
 
 | Đường dẫn | Nội dung |
 |---|---|
-| `config.json` | Tham số của dự án: seed 2026, kiểu `float64`, bước h0 = 30 giây, các kiểu lưới gốc, hệ số làm thưa lưới, các mức Q, dung sai chia đôi, đơn vị |
+| `config.json` | Tham số của dự án: seed 2026, kiểu `float64`, các kiểu lưới gốc, hệ số làm thưa lưới, các mức Q, dung sai chia đôi, đơn vị |
 | `data/analysis_snapshot.csv` | Bản chép của `shared/analysis_snapshot.csv` (giảng viên cung cấp). Tự chép vào trước khi chạy |
 | `data/segment_A.csv`, `data/segment_B.csv` | Hai đoạn quan sát nguồn (giữ nguyên số đếm và nhãn); cột `t_min` là thời gian tính bằng phút từ mốc đầu đoạn |
 | `data/grid_A_timestamps_f1.csv`, `grid_B_timestamps_f1.csv` | **Lưới gốc chính:** timestamp thật (100 mốc, không đều). Cơ sở: Quy định 2.3 mục 4 (nội suy/hình thang cho phép timestamp không đều) |
