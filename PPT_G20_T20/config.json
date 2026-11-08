@@ -1,0 +1,74 @@
+{
+  "topic": "De tai 20 - Thoi diem dat chi so tai tich luy",
+  "seed": 2026,
+  "dtype": "float64",
+  "snapshot_path": "data/analysis_snapshot.csv",
+  "segments": [
+    "A",
+    "B"
+  ],
+  "min_obs": 80,
+  "max_obs": 300,
+  "gap_factor": 3.0,
+  "h0_seconds": 30,
+  "base_grids": [
+    "timestamps"
+  ],
+  "thin_factors": [
+    1,
+    2,
+    4
+  ],
+  "q_fractions": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "bisection": {
+    "tol_minutes": 1e-06,
+    "max_iter": 100
+  },
+  "tol_study_minutes": [
+    0.01,
+    0.0001,
+    1e-06,
+    1e-08
+  ],
+  "verification": {
+    "q_values": [
+      0.25,
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.4
+    ],
+    "tol_minutes_list": [
+      1e-06,
+      1e-12
+    ],
+    "n_intervals_linear": 10,
+    "smooth_function": "y = 1 + t + t^2 tren [0,1], I(T) = T + T^2/2 + T^3/3, I(1) = 11/6",
+    "smooth_q_values": [
+      0.25,
+      0.5,
+      1.0,
+      1.5,
+      1.75
+    ],
+    "smooth_n_list": [
+      4,
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "smooth_tol_minutes": 1e-13
+  },
+  "units": {
+    "time": "phut",
+    "y": "xe",
+    "integral": "xe.phut"
+  }
+}
