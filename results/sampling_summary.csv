@@ -1,0 +1,7 @@
+﻿segment,grid,thin,MAE_phut,RMSE_phut,Einf_phut,chi_bao_p
+A,timestamps,f2,0.5565,0.5836,0.7687,
+A,timestamps,f4,2.7505,2.9363,4.2017,
+A,timestamps,chi_bao_p,,,,2.451
+B,timestamps,f2,1.7696,2.1131,3.1332,
+B,timestamps,f4,1.2360,1.2454,1.4522,
+B,timestamps,chi_bao_p,,,,-1.109
