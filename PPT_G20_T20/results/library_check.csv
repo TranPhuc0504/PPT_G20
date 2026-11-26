@@ -1,0 +1,83 @@
+﻿STT,Mục,Đại lượng,Đoạn,Lưới,Mức Q / mốc,Hàm tự viết,Hàm thư viện,Giá trị tự viết,Giá trị thư viện,|Chênh lệch|,Ngưỡng,Đơn vị,Kết quả
+1,1,Tổng tải I_tot,A,f1,,cumulative()[-1],numpy.trapezoid,1438.925000000,1438.925000000,< 1e-12,1e-09,xe·phút,ĐẠT
+2,1,Tổng tải I_tot,A,f2,,cumulative()[-1],numpy.trapezoid,1518.108333333,1518.108333333,< 1e-12,1e-09,xe·phút,ĐẠT
+3,1,Tổng tải I_tot,A,f4,,cumulative()[-1],numpy.trapezoid,1763.616666667,1763.616666667,< 1e-12,1e-09,xe·phút,ĐẠT
+4,1,Tổng tải I_tot,B,f1,,cumulative()[-1],numpy.trapezoid,246.391666667,246.391666667,< 1e-12,1e-09,xe·phút,ĐẠT
+5,1,Tổng tải I_tot,B,f2,,cumulative()[-1],numpy.trapezoid,260.500000000,260.500000000,< 1e-12,1e-09,xe·phút,ĐẠT
+6,1,Tổng tải I_tot,B,f4,,cumulative()[-1],numpy.trapezoid,254.733333333,254.733333333,< 1e-12,1e-09,xe·phút,ĐẠT
+7,1,Tổng tải I_tot,Kiểm chứng y=1+t,10 khoảng,,cumulative()[-1],numpy.trapezoid,1.500000000,1.500000000,< 1e-12,1e-09,xe·phút,ĐẠT
+,1,tổng hợp mục 1,,,,cumulative()[-1],numpy.trapezoid,7 phép so,7/7 ĐẠT,< 1e-12,1e-09,xe·phút,ĐẠT
+8,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),A,f1,,cumulative(),scipy.integrate.cumulative_trapezoid,"100 mốc, khớp tuyệt đối",100 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+9,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),A,f2,,cumulative(),scipy.integrate.cumulative_trapezoid,"51 mốc, khớp tuyệt đối",51 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+10,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),A,f4,,cumulative(),scipy.integrate.cumulative_trapezoid,"26 mốc, khớp tuyệt đối",26 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+11,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),B,f1,,cumulative(),scipy.integrate.cumulative_trapezoid,"100 mốc, khớp tuyệt đối",100 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+12,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),B,f2,,cumulative(),scipy.integrate.cumulative_trapezoid,"51 mốc, khớp tuyệt đối",51 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+13,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),B,f4,,cumulative(),scipy.integrate.cumulative_trapezoid,"26 mốc, khớp tuyệt đối",26 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+14,2,Dãy tích lũy I_k (mốc có sai số lớn nhất),Kiểm chứng y=1+t,10 khoảng,,cumulative(),scipy.integrate.cumulative_trapezoid,"11 mốc, khớp tuyệt đối",11 mốc,< 1e-12,1e-09,xe·phút,ĐẠT
+,2,tổng hợp mục 2,,,,cumulative(),scipy.integrate.cumulative_trapezoid,7 phép so,7/7 ĐẠT,< 1e-12,1e-09,xe·phút,ĐẠT
+15,3,Tải I(T) tại T,A,f1,25%,I_of_T(),numpy.interp + trapezoid,359.731256742,359.731256742,< 1e-12,1e-09,xe·phút,ĐẠT
+16,3,Tải I(T) tại T,A,f1,50%,I_of_T(),numpy.interp + trapezoid,719.462501060,719.462501060,< 1e-12,1e-09,xe·phút,ĐẠT
+17,3,Tải I(T) tại T,A,f1,75%,I_of_T(),numpy.interp + trapezoid,1079.193759062,1079.193759062,< 1e-12,1e-09,xe·phút,ĐẠT
+18,3,Tải I(T) tại T,A,f2,25%,I_of_T(),numpy.interp + trapezoid,379.527084156,379.527084156,< 1e-12,1e-09,xe·phút,ĐẠT
+19,3,Tải I(T) tại T,A,f2,50%,I_of_T(),numpy.interp + trapezoid,759.054167215,759.054167215,< 1e-12,1e-09,xe·phút,ĐẠT
+20,3,Tải I(T) tại T,A,f2,75%,I_of_T(),numpy.interp + trapezoid,1138.581251201,1138.581251201,< 1e-12,1e-09,xe·phút,ĐẠT
+21,3,Tải I(T) tại T,A,f4,25%,I_of_T(),numpy.interp + trapezoid,440.904168382,440.904168382,< 1e-12,1e-09,xe·phút,ĐẠT
+22,3,Tải I(T) tại T,A,f4,50%,I_of_T(),numpy.interp + trapezoid,881.808339357,881.808339357,< 1e-12,1e-09,xe·phút,ĐẠT
+23,3,Tải I(T) tại T,A,f4,75%,I_of_T(),numpy.interp + trapezoid,1322.712500768,1322.712500768,< 1e-12,1e-09,xe·phút,ĐẠT
+24,3,Tải I(T) tại T,B,f1,25%,I_of_T(),numpy.interp + trapezoid,61.597916736,61.597916736,< 1e-12,1e-09,xe·phút,ĐẠT
+25,3,Tải I(T) tại T,B,f1,50%,I_of_T(),numpy.interp + trapezoid,123.195834678,123.195834678,< 1e-12,1e-09,xe·phút,ĐẠT
+26,3,Tải I(T) tại T,B,f1,75%,I_of_T(),numpy.interp + trapezoid,184.793751404,184.793751404,< 1e-12,1e-09,xe·phút,ĐẠT
+27,3,Tải I(T) tại T,B,f2,25%,I_of_T(),numpy.interp + trapezoid,65.125000290,65.125000290,< 1e-12,1e-09,xe·phút,ĐẠT
+28,3,Tải I(T) tại T,B,f2,50%,I_of_T(),numpy.interp + trapezoid,130.250003265,130.250003265,< 1e-12,1e-09,xe·phút,ĐẠT
+29,3,Tải I(T) tại T,B,f2,75%,I_of_T(),numpy.interp + trapezoid,195.375001556,195.375001556,< 1e-12,1e-09,xe·phút,ĐẠT
+30,3,Tải I(T) tại T,B,f4,25%,I_of_T(),numpy.interp + trapezoid,63.683333794,63.683333794,< 1e-12,1e-09,xe·phút,ĐẠT
+31,3,Tải I(T) tại T,B,f4,50%,I_of_T(),numpy.interp + trapezoid,127.366667661,127.366667661,< 1e-12,1e-09,xe·phút,ĐẠT
+32,3,Tải I(T) tại T,B,f4,75%,I_of_T(),numpy.interp + trapezoid,191.050002069,191.050002069,< 1e-12,1e-09,xe·phút,ĐẠT
+33,3,Tải I(T) tại T,Kiểm chứng y=1+t,10 khoảng,Q=0.375,I_of_T(),numpy.interp + trapezoid,0.375000425,0.375000425,< 1e-12,1e-09,xe·phút,ĐẠT
+34,3,Tải I(T) tại T,Kiểm chứng y=1+t,10 khoảng,Q=0.75,I_of_T(),numpy.interp + trapezoid,0.750000407,0.750000407,< 1e-12,1e-09,xe·phút,ĐẠT
+35,3,Tải I(T) tại T,Kiểm chứng y=1+t,10 khoảng,Q=1.125,I_of_T(),numpy.interp + trapezoid,1.125000400,1.125000400,< 1e-12,1e-09,xe·phút,ĐẠT
+,3,tổng hợp mục 3,,,,I_of_T(),numpy.interp + trapezoid,21 phép so,21/21 ĐẠT,< 1e-12,1e-09,xe·phút,ĐẠT
+36,4,Nghiệm T so với nghiệm đúng,A,f1,25%,"bisect(), T = b",numpy.searchsorted + roots,17.806182102,17.806181889,2.129e-07,5e-07,phút,ĐẠT
+37,4,Nghiệm T so với nghiệm đúng,A,f1,50%,"bisect(), T = b",numpy.searchsorted + roots,37.443147033,37.443146988,4.525e-08,5e-07,phút,ĐẠT
+38,4,Nghiệm T so với nghiệm đúng,A,f1,75%,"bisect(), T = b",numpy.searchsorted + roots,53.288040417,53.288040175,2.424e-07,5e-07,phút,ĐẠT
+39,4,Nghiệm T so với nghiệm đúng,A,f2,25%,"bisect(), T = b",numpy.searchsorted + roots,17.886926389,17.886926358,3.162e-08,5e-07,phút,ĐẠT
+40,4,Nghiệm T so với nghiệm đúng,A,f2,50%,"bisect(), T = b",numpy.searchsorted + roots,38.544533781,38.544533740,4.045e-08,5e-07,phút,ĐẠT
+41,4,Nghiệm T so với nghiệm đúng,A,f2,75%,"bisect(), T = b",numpy.searchsorted + roots,56.490836701,56.490836634,6.707e-08,5e-07,phút,ĐẠT
+42,4,Nghiệm T so với nghiệm đúng,A,f4,25%,"bisect(), T = b",numpy.searchsorted + roots,21.601894095,21.601893939,1.559e-07,5e-07,phút,ĐẠT
+43,4,Nghiệm T so với nghiệm đúng,A,f4,50%,"bisect(), T = b",numpy.searchsorted + roots,42.482163987,42.482163762,2.254e-07,5e-07,phút,ĐẠT
+44,4,Nghiệm T so với nghiệm đúng,A,f4,75%,"bisect(), T = b",numpy.searchsorted + roots,58.288521647,58.288521581,6.568e-08,5e-07,phút,ĐẠT
+45,4,Nghiệm T so với nghiệm đúng,B,f1,25%,"bisect(), T = b",numpy.searchsorted + roots,11.630729184,11.630729167,1.726e-08,5e-07,phút,ĐẠT
+46,4,Nghiệm T so với nghiệm đúng,B,f1,50%,"bisect(), T = b",numpy.searchsorted + roots,25.026042003,25.026041667,3.361e-07,5e-07,phút,ĐẠT
+47,4,Nghiệm T so với nghiệm đúng,B,f1,75%,"bisect(), T = b",numpy.searchsorted + roots,35.936018284,35.936018083,2.015e-07,5e-07,phút,ĐẠT
+48,4,Nghiệm T so với nghiệm đúng,B,f2,25%,"bisect(), T = b",numpy.searchsorted + roots,12.244567548,12.244567462,8.585e-08,5e-07,phút,ĐẠT
+49,4,Nghiệm T so với nghiệm đúng,B,f2,50%,"bisect(), T = b",numpy.searchsorted + roots,23.810716760,23.810716412,3.479e-07,5e-07,phút,ĐẠT
+50,4,Nghiệm T so với nghiệm đúng,B,f2,75%,"bisect(), T = b",numpy.searchsorted + roots,35.575573467,35.575573184,2.835e-07,5e-07,phút,ĐẠT
+51,4,Nghiệm T so với nghiệm đúng,B,f4,25%,"bisect(), T = b",numpy.searchsorted + roots,13.974487010,13.974486786,2.245e-07,5e-07,phút,ĐẠT
+52,4,Nghiệm T so với nghiệm đúng,B,f4,50%,"bisect(), T = b",numpy.searchsorted + roots,24.338633698,24.338633581,1.170e-07,5e-07,phút,ĐẠT
+53,4,Nghiệm T so với nghiệm đúng,B,f4,75%,"bisect(), T = b",numpy.searchsorted + roots,35.831373575,35.831373285,2.903e-07,5e-07,phút,ĐẠT
+54,4,Nghiệm T so với nghiệm đúng,Kiểm chứng y=1+t,10 khoảng,Q=0.375,"bisect(), T = b",numpy.searchsorted + roots,0.322875977,0.322875656,3.210e-07,5e-07,phút,ĐẠT
+55,4,Nghiệm T so với nghiệm đúng,Kiểm chứng y=1+t,10 khoảng,Q=0.75,"bisect(), T = b",numpy.searchsorted + roots,0.581139088,0.581138830,2.576e-07,5e-07,phút,ĐẠT
+56,4,Nghiệm T so với nghiệm đúng,Kiểm chứng y=1+t,10 khoảng,Q=1.125,"bisect(), T = b",numpy.searchsorted + roots,0.802775860,0.802775638,2.221e-07,5e-07,phút,ĐẠT
+,4,tổng hợp mục 4,,,,"bisect(), T = b",numpy.searchsorted + roots,21 phép so,21/21 ĐẠT,3.479e-07,5e-07,phút,ĐẠT
+57,5,Nghiệm T so với chia đôi thư viện,A,f1,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),17.806182102,17.806182357,2.551e-07,1e-06,phút,ĐẠT
+58,5,Nghiệm T so với chia đôi thư viện,A,f1,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),37.443147033,37.443146523,5.101e-07,1e-06,phút,ĐẠT
+59,5,Nghiệm T so với chia đôi thư viện,A,f1,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),53.288040417,53.288039907,5.101e-07,1e-06,phút,ĐẠT
+60,5,Nghiệm T so với chia đôi thư viện,A,f2,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),17.886926389,17.886926645,2.551e-07,1e-06,phút,ĐẠT
+61,5,Nghiệm T so với chia đôi thư viện,A,f2,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),38.544533781,38.544533781,< 1e-12,1e-06,phút,ĐẠT
+62,5,Nghiệm T so với chia đôi thư viện,A,f2,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),56.490836701,56.490836446,2.551e-07,1e-06,phút,ĐẠT
+63,5,Nghiệm T so với chia đôi thư viện,A,f4,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),21.601894095,21.601894350,2.551e-07,1e-06,phút,ĐẠT
+64,5,Nghiệm T so với chia đôi thư viện,A,f4,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),42.482163987,42.482164242,2.551e-07,1e-06,phút,ĐẠT
+65,5,Nghiệm T so với chia đôi thư viện,A,f4,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),58.288521647,58.288521392,2.551e-07,1e-06,phút,ĐẠT
+66,5,Nghiệm T so với chia đôi thư viện,B,f1,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),11.630729184,11.630728822,3.617e-07,1e-06,phút,ĐẠT
+67,5,Nghiệm T so với chia đôi thư viện,B,f1,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),25.026042003,25.026041641,3.617e-07,1e-06,phút,ĐẠT
+68,5,Nghiệm T so với chia đôi thư viện,B,f1,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),35.936018284,35.936018284,< 1e-12,1e-06,phút,ĐẠT
+69,5,Nghiệm T so với chia đôi thư viện,B,f2,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),12.244567548,12.244567186,3.617e-07,1e-06,phút,ĐẠT
+70,5,Nghiệm T so với chia đôi thư viện,B,f2,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),23.810716760,23.810717122,3.617e-07,1e-06,phút,ĐẠT
+71,5,Nghiệm T so với chia đôi thư viện,B,f2,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),35.575573467,35.575573105,3.617e-07,1e-06,phút,ĐẠT
+72,5,Nghiệm T so với chia đôi thư viện,B,f4,25%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),13.974487010,13.974487010,< 1e-12,1e-06,phút,ĐẠT
+73,5,Nghiệm T so với chia đôi thư viện,B,f4,50%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),24.338633698,24.338634060,3.617e-07,1e-06,phút,ĐẠT
+74,5,Nghiệm T so với chia đôi thư viện,B,f4,75%,"bisect(), T = b",scipy.optimize.bisect (cùng tol),35.831373575,35.831373937,3.617e-07,1e-06,phút,ĐẠT
+75,5,Nghiệm T so với chia đôi thư viện,Kiểm chứng y=1+t,10 khoảng,Q=0.375,"bisect(), T = b",scipy.optimize.bisect (cùng tol),0.322875977,0.322875023,9.537e-07,1e-06,phút,ĐẠT
+76,5,Nghiệm T so với chia đôi thư viện,Kiểm chứng y=1+t,10 khoảng,Q=0.75,"bisect(), T = b",scipy.optimize.bisect (cùng tol),0.581139088,0.581139565,4.768e-07,1e-06,phút,ĐẠT
+77,5,Nghiệm T so với chia đôi thư viện,Kiểm chứng y=1+t,10 khoảng,Q=1.125,"bisect(), T = b",scipy.optimize.bisect (cùng tol),0.802775860,0.802775383,4.768e-07,1e-06,phút,ĐẠT
+,5,tổng hợp mục 5,,,,"bisect(), T = b",scipy.optimize.bisect (cùng tol),21 phép so,21/21 ĐẠT,9.537e-07,1e-06,phút,ĐẠT

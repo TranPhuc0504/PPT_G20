@@ -1,33 +1,35 @@
-﻿segment,check,value,level
-A,so_quan_sat,100,OK
-A,trung_timestamp,0,OK
-A,buoc_min_s,36.0,INFO
-A,buoc_trung_vi_s,37.0,INFO
-A,buoc_max_s,74.0,INFO
-A,gap_lon_hon_3x_trung_vi,0,OK
-A,so_recording,1,OK
-A,y_am_hoac_khong_huu_han,0,OK
-A,do_dai_doan_phut,68.4667,INFO
-A,label_status,unreviewed_prelabel,WARN
-A,luoi_f1_so_moc,100,OK
-A,luoi_f1_dau_cuoi_phut,0.0000..68.4667,INFO
-A,luoi_f2_so_moc,51,OK
-A,luoi_f2_dau_cuoi_phut,0.0000..68.4667,INFO
-A,luoi_f4_so_moc,26,OK
-A,luoi_f4_dau_cuoi_phut,0.0000..68.4667,INFO
-B,so_quan_sat,100,OK
-B,trung_timestamp,0,OK
-B,buoc_min_s,24.0,INFO
-B,buoc_trung_vi_s,25.0,INFO
-B,buoc_max_s,50.0,INFO
-B,gap_lon_hon_3x_trung_vi,0,OK
-B,so_recording,1,OK
-B,y_am_hoac_khong_huu_han,0,OK
-B,do_dai_doan_phut,48.55,INFO
-B,label_status,unreviewed_prelabel,WARN
-B,luoi_f1_so_moc,100,OK
-B,luoi_f1_dau_cuoi_phut,0.0000..48.5500,INFO
-B,luoi_f2_so_moc,51,OK
-B,luoi_f2_dau_cuoi_phut,0.0000..48.5500,INFO
-B,luoi_f4_so_moc,26,OK
-B,luoi_f4_dau_cuoi_phut,0.0000..48.5500,INFO
+﻿Đoạn,Kiểm tra,Giá trị,Mức
+A,Số ảnh,100,OK
+A,Số cặp ảnh trùng thời điểm,0,OK
+A,Bước nhỏ nhất (giây),36.0,THÔNG TIN
+A,Bước trung vị h0 (giây),37.0,THÔNG TIN
+A,Bước lớn nhất (giây),74.0,THÔNG TIN
+A,Khoảng trống > 3 lần trung vị,0,OK
+A,Số lần ghi hình (recording),1,OK
+A,Số ảnh có số xe âm hoặc trống,0,OK
+A,Độ dài đoạn (phút),68.4667,THÔNG TIN
+A,Số xe trung bình các ảnh (xe),20.96,THÔNG TIN
+A,Trạng thái nhãn,unreviewed_prelabel,CẢNH BÁO
+A,Lưới f1: số mốc,100,OK
+A,Lưới f1: đầu..cuối (phút),0.0000..68.4667,THÔNG TIN
+A,Lưới f2: số mốc,51,OK
+A,Lưới f2: đầu..cuối (phút),0.0000..68.4667,THÔNG TIN
+A,Lưới f4: số mốc,26,OK
+A,Lưới f4: đầu..cuối (phút),0.0000..68.4667,THÔNG TIN
+B,Số ảnh,100,OK
+B,Số cặp ảnh trùng thời điểm,0,OK
+B,Bước nhỏ nhất (giây),24.0,THÔNG TIN
+B,Bước trung vị h0 (giây),25.0,THÔNG TIN
+B,Bước lớn nhất (giây),50.0,THÔNG TIN
+B,Khoảng trống > 3 lần trung vị,0,OK
+B,Số lần ghi hình (recording),1,OK
+B,Số ảnh có số xe âm hoặc trống,0,OK
+B,Độ dài đoạn (phút),48.55,THÔNG TIN
+B,Số xe trung bình các ảnh (xe),5.09,THÔNG TIN
+B,Trạng thái nhãn,unreviewed_prelabel,CẢNH BÁO
+B,Lưới f1: số mốc,100,OK
+B,Lưới f1: đầu..cuối (phút),0.0000..48.5500,THÔNG TIN
+B,Lưới f2: số mốc,51,OK
+B,Lưới f2: đầu..cuối (phút),0.0000..48.5500,THÔNG TIN
+B,Lưới f4: số mốc,26,OK
+B,Lưới f4: đầu..cuối (phút),0.0000..48.5500,THÔNG TIN

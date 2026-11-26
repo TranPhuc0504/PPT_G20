@@ -1,19 +1,31 @@
-"""Mô hình tính toán"""
-# ==== Phần 1: chuẩn bị ===============================
+"""Đề tài 20 - Mô hình tính toán: tích phân hình thang, chia đôi, khảo sát làm thưa lưới và dung sai.
+
+Chạy từ thư mục gốc:
+  python src\\mo_hinh.py          -> menu: 1 chạy hết, 2 tính riêng, 3 kiểm chứng
+  python src\\mo_hinh.py --het    -> chạy hết, không hỏi
+  python src\\mo_hinh.py --demo   -> mở thẳng menu tính riêng
+"""
+# ==== Phần 1: chuẩn bị =============================================
 import argparse
 import csv
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
 
 try:
-    HERE = Path(__file__).resolve().parent   # chạy cả file: thư mục chứa file
+    sys.stdout.reconfigure(encoding="utf-8")         # in tiếng Việt có dấu ra terminal không bị lỗi
+except Exception:
+    pass
+
+try:
+    HERE = Path(__file__).resolve().parent           # chạy cả file: thư mục chứa file
 except NameError:
-    HERE = Path.cwd()                        # chạy từng ô: thư mục đang làm việc
+    HERE = Path.cwd()                                # chạy từng ô: thư mục đang làm việc
 ROOT = HERE if (HERE / "config.json").exists() else HERE.parent   # tự tìm config.json
-DTYPE = np.float64                           # Kiểu số thực 64 bit
+DTYPE = np.float64                                   # kiểu số thực 64 bit
 
 
 def load_config():
@@ -27,58 +39,63 @@ def data_dir():
 
 def results_dir():
     d = ROOT / "results"
-    d.mkdir(exist_ok=True)          # chua co thu muc results thi tu tao
+    d.mkdir(exist_ok=True)                           # chưa có thư mục results thì tự tạo
     return d
 
-# ==== Phần 2: tích phân hình thang =============================
+
+# ==== Phần 2: tích phân hình thang =================================
 # 2.1: Đọc dữ liệu từ lưới (grid) và kiểm tra tính hợp lệ
 
 def grid_path(seg, kind, f):
-    # Tạo đường dẫn file lưới, ví dụ ("A", "timestamps", 1) -> data\grid_A_timestamps_f1.csv
+    # Đường dẫn file lưới, ví dụ ("A", "timestamps", 1) -> data\grid_A_timestamps_f1.csv
     return data_dir() / ("grid_%s_%s_f%d.csv" % (seg, kind, f))
 
 
 def read_grid(path):
     # Đọc file lưới, trả về 2 mảng: t (phút) và y (số xe)
     t, y = [], []
-    with open(path, encoding="utf-8-sig", newline="") as fh: # utf-8-sig: bỏ ký tự ẩn BOM của Excel
+    with open(path, encoding="utf-8-sig", newline="") as fh:   # utf-8-sig: bỏ ký tự ẩn BOM của Excel
         for r in csv.DictReader(fh):
             t.append(float(r["t_min"]))
             y.append(float(r["y"]))
-    return np.asarray(t, dtype=DTYPE), np.asarray(y, dtype=DTYPE) # đổi sang mảng float64
+    return np.asarray(t, dtype=DTYPE), np.asarray(y, dtype=DTYPE)
 
 
 def check_grid(t, y):
     # Kiểm tra dữ liệu trước khi tính; sai thì dừng và báo lỗi
-    if len(t) != len(y) or len(t) < 2: # t, y phải cùng độ dài (số mốc) và có ít nhất 2 mốc
-        raise ValueError("can it nhat 2 moc va len(t) == len(y)")
+    if len(t) != len(y) or len(t) < 2:               # t, y cùng độ dài và có ít nhất 2 mốc
+        raise ValueError("Cần ít nhất 2 mốc và số phần tử t, y phải bằng nhau")
     for i in range(len(t)):
         if not (t[i] == t[i]) or abs(t[i]) == float("inf") or not (y[i] == y[i]):
-            raise ValueError("gia tri khong huu han tai moc %d" % i)
-        if i > 0 and not t[i] > t[i - 1]: # thời gian phải tăng dần, không trùng
-            raise ValueError("thoi gian phai tang nghiem ngat (moc %d)" % i)
+            raise ValueError("Giá trị không hữu hạn tại mốc %d" % i)
+        if i > 0 and not t[i] > t[i - 1]:            # thời gian phải tăng dần, không trùng
+            raise ValueError("Thời gian phải tăng nghiêm ngặt (mốc %d)" % i)
+
 
 # 2.2: Tích phân hình thang
+
 def cumulative(t, y):
     # Tải tích lũy tại từng mốc: I[0] = 0, I[k+1] = I[k] + diện tích hình thang khoảng k
-    n = len(t) 
-    I = np.zeros(n, dtype=DTYPE) # tạo n ô toàn số 0; ô đầu I[0] = 0
-    for k in range(n - 1): # đi qua n-1 khoảng
-        h = t[k + 1] - t[k] # bề rộng khoảng k (phút)
-        I[k + 1] = I[k] + h * (y[k] + y[k + 1]) / 2.0 # cộng diện tích hình thang
-    return I # I[-1] là tổng tải I_tot (xe.phút)
+    n = len(t)
+    I = np.zeros(n, dtype=DTYPE)                     # n ô toàn số 0; ô đầu I[0] = 0
+    for k in range(n - 1):                           # đi qua n-1 khoảng
+        h = t[k + 1] - t[k]                          # bề rộng khoảng k (phút)
+        I[k + 1] = I[k] + h * (y[k] + y[k + 1]) / 2.0
+    return I                                         # I[-1] là tổng tải I_tot (xe·phút)
+
 
 # Thử 2.2: nhập khoảng k -> xem hình thang A_k và I_k, I_k+1
+
 def chon_luoi():
     # Hỏi đoạn và mức làm thưa, đọc lưới, kiểm tra, tính tích lũy
-    seg = input("Doan (A/B, Enter = A): ").strip().upper() or "A"
-    f = int(input("Muc lam thua f (1/2/4, Enter = 1): ").strip() or 1)
+    seg = input("Đoạn (A/B, Enter = A): ").strip().upper() or "A"
+    f = int(input("Mức làm thưa f (1/2/4, Enter = 1): ").strip() or 1)
     t, y = read_grid(grid_path(seg, "timestamps", f))
     check_grid(t, y)
     I = cumulative(t, y)
     n = len(t)
-    print("Doan %s, f%d: %d moc (0..%d), %d khoang (k = 0..%d)" % (seg, f, n, n - 1, n - 1, n - 2))
-    print("T tu %.4f den %.4f phut | I_tot = %.4f xe.phut" % (t[0], t[-1], I[-1]))
+    print("Đoạn %s, f%d: %d mốc (0..%d), %d khoảng (k = 0..%d)" % (seg, f, n, n - 1, n - 1, n - 2))
+    print("T từ %.4f đến %.4f phút | I_tot = %.4f xe·phút" % (t[0], t[-1], I[-1]))
     return t, y, I
 
 
@@ -86,85 +103,83 @@ def thu_tich_phan():
     t, y, I = chon_luoi()
     n = len(t)
     while True:
-        s = input("\nNhap khoang k (0..%d), Enter de thoat: " % (n - 2)).strip()
-        if s == "":                                   # Enter trống -> thoát
+        s = input("\nNhập khoảng k (0..%d), Enter để thoát: " % (n - 2)).strip()
+        if s == "":                                  # Enter trống -> thoát
             break
         try:
-            k = int(s)                                # k là số nguyên
+            k = int(s)
         except ValueError:
-            print("  Hay nhap so nguyen.")
+            print("  Hãy nhập số nguyên.")
             continue
-        if not (0 <= k <= n - 2):                     # n mốc thì có n-1 khoảng: 0..n-2
-            print("  k phai tu 0 den %d." % (n - 2))
+        if not (0 <= k <= n - 2):                    # n mốc thì có n-1 khoảng: 0..n-2
+            print("  k phải từ 0 đến %d." % (n - 2))
             continue
-        h = t[k + 1] - t[k]                           # bề rộng khoảng
-        A = h * (y[k] + y[k + 1]) / 2.0               # diện tích hình thang
-        print("  Moc k   : t = %.4f phut, y = %g xe" % (t[k], y[k]))
-        print("  Moc k+1 : t = %.4f phut, y = %g xe" % (t[k + 1], y[k + 1]))
-        print("  h = %.4f phut | hinh thang A_k = h*(y_k + y_k+1)/2 = %.4f xe.phut" % (h, A))
-        print("  I_k = %.4f  ->  I_k+1 = I_k + A_k = %.4f xe.phut" % (I[k], I[k + 1]))
+        h = t[k + 1] - t[k]
+        A = h * (y[k] + y[k + 1]) / 2.0              # diện tích hình thang
+        print("  Mốc k   : t = %.4f phút, y = %g xe" % (t[k], y[k]))
+        print("  Mốc k+1 : t = %.4f phút, y = %g xe" % (t[k + 1], y[k + 1]))
+        print("  h = %.4f phút | hình thang A_k = h(y_k + y_k+1)/2 = %.4f xe·phút" % (h, A))
+        print("  I_k = %.4f  ->  I_k+1 = I_k + A_k = %.4f xe·phút" % (I[k], I[k + 1]))
+
 
 # 2.3: Tải tích lũy tại thời điểm T bất kỳ
 
 def locate(t, T):
-    # Tìm khoảng k chứa T, tức là t[k] <= T <= t[k+1] (tìm nhị phân, chỉ so T với các mốc t)
+    # Tìm khoảng k chứa T, tức t[k] <= T <= t[k+1] (tìm nhị phân, chỉ so T với các mốc t)
     n = len(t)
-    if T <= t[0]:                   # T ở trước hoặc đúng mốc đầu -> khoảng đầu
+    if T <= t[0]:
         return 0
-    if T >= t[n - 1]:               # T ở sau hoặc đúng mốc cuối -> khoảng cuối
-        return n - 2 
-    lo, hi = 0, n - 1               # vùng đang tìm: từ mốc đầu đến mốc cuối
-    while hi - lo > 1:              # còn hơn 1 khoảng thì tiếp tục thu hẹp
-        mid = (lo + hi) // 2        # mốc ở giữa (// là chia lấy phần nguyên)
+    if T >= t[n - 1]:
+        return n - 2
+    lo, hi = 0, n - 1
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
         if t[mid] <= T:
-            lo = mid                # T nằm bên phải mid
+            lo = mid                                 # T nằm bên phải mid
         else:
-            hi = mid                # T nằm bên trái mid
-    return lo                       # t[lo] <= T < t[lo+1] -> khoảng k = lo
+            hi = mid                                 # T nằm bên trái mid
+    return lo
 
 
 def y_interp(t, y, T):
-    # Số xe ỹ(T) tại T: nối thẳng giữa 2 mốc (nội suy tuyến tính từng đoạn)
+    # Số xe ỹ(T): nối thẳng giữa 2 mốc (nội suy tuyến tính từng đoạn)
     k = locate(t, T)
     h = t[k + 1] - t[k]
-    return y[k] + (y[k + 1] - y[k]) * (T - t[k]) / h   # y_k + độ dốc * quãng đã đi
+    return y[k] + (y[k + 1] - y[k]) * (T - t[k]) / h
 
 
 def I_of_T(t, y, I, T):
     # Tải tích lũy từ đầu đến T: I(T) = I_k + y_k*s + m*s^2/2
-    k = locate(t, T)                                # T nằm trong khoảng k
-    s = T - t[k]                                    # quãng đã đi trong khoảng k (phút)
-    m = (y[k + 1] - y[k]) / (t[k + 1] - t[k])       # độ dốc đoạn thẳng ỹ trong khoảng k
-    return I[k] + y[k] * s + m * s * s / 2.0        # tích lũy đến mốc k + phần hình thang từ t_k đến T
+    k = locate(t, T)
+    s = T - t[k]                                     # quãng đã đi trong khoảng k (phút)
+    m = (y[k + 1] - y[k]) / (t[k + 1] - t[k])        # độ dốc của ỹ trong khoảng k
+    return I[k] + y[k] * s + m * s * s / 2.0
 
 
-# Thử Phần 2.3: nhập số từ bàn phím
+# Thử 2.3: nhập T -> khoảng chứa T, số xe tại T, tải tích lũy đến T
+
 def thu_nhap():
-    seg = input("Doan (A/B, Enter = A): ").strip().upper() or "A"          # chọn đoạn
-    f = int(input("Muc lam thua f (1/2/4, Enter = 1): ").strip() or 1)     # chọn lưới
-    t, y = read_grid(grid_path(seg, "timestamps", f))   # đọc lưới
-    check_grid(t, y)                                     # kiểm tra dữ liệu
-    I = cumulative(t, y)                                 # tải tích lũy tại các mốc
-    print("So moc: %d | T tu %.4f den %.4f phut | I_tot = %.4f xe.phut" % (len(t), t[0], t[-1], I[-1]))
-    while True:                                          # lặp: nhập T nhiều lần
-        s = input("\nNhap T (phut), Enter de thoat: ").strip()
-        if s == "":                                      # bấm Enter không gõ gì -> thoát
+    t, y, I = chon_luoi()
+    while True:
+        s = input("\nNhập T (phút), Enter để thoát: ").strip()
+        if s == "":
             break
         try:
-            T = float(s)                                 # đổi chữ -> số
-        except ValueError:                               # gõ chữ không phải số
-            print("  Hay nhap mot so.")
+            T = float(s)
+        except ValueError:
+            print("  Hãy nhập một số.")
             continue
-        if not (t[0] <= T <= t[-1]):                     # T phải nằm trong đoạn
-            print("  T phai nam trong [%.4f, %.4f]" % (t[0], t[-1]))
+        if not (t[0] <= T <= t[-1]):
+            print("  T phải nằm trong [%.4f, %.4f]" % (t[0], t[-1]))
             continue
-        k = locate(t, T)                                 # khoảng chứa T
-        iT = I_of_T(t, y, I, T)                          # tải tích lũy đến T
-        print("  Khoang k = %d (giua t = %.4f va t = %.4f)" % (k, t[k], t[k + 1]))
-        print("  So xe y(T) = %.4f xe" % y_interp(t, y, T))
-        print("  Tai I(T)   = %.4f xe.phut (%.2f%% tong)" % (iT, 100 * iT / I[-1]))
+        k = locate(t, T)
+        iT = I_of_T(t, y, I, T)
+        print("  Khoảng k = %d (giữa t = %.4f và t = %.4f)" % (k, t[k], t[k + 1]))
+        print("  Số xe ỹ(T) = %.4f xe" % y_interp(t, y, T))
+        print("  Tải I(T)   = %.4f xe·phút (%.2f%% tổng)" % (iT, 100 * iT / I[-1]))
 
- # ==== Phần 3: tìm T bằng chia đôi ================================================
+
+# ==== Phần 3: tìm T bằng chia đôi ==================================
 # 3.1: Lập phương trình F(T) = I(T) - Q = 0
 
 def q_levels(total, fractions):
@@ -178,31 +193,43 @@ def F_of_T(t, y, I, Q, T):
 
 
 # 3.2: Thuật toán chia đôi
+#   Luôn giữ F(a) < 0 <= F(b). Dừng khi b - a <= tol/2 (tức chạy thêm 1 vòng so với b - a <= tol).
+#   Lấy T = b (cận trên): bảo đảm I(T) >= Q, và |T - T*| <= b - a <= tol/2.
+#   Trả thêm T_giua = (a + b)/2 để so sánh (cận sai số (b - a)/2 nhưng có thể F(T_giua) < 0).
 
 def bisect(t, y, I, Q, tol, max_iter, F=None, in_vong=False):
-    # Tìm T trong [t0, tN] sao cho F(T) = 0; trả về T, số vòng, độ rộng khoảng, residual
-    if F is None:                                   # mặc định: F(T) = I(T) - Q trên lưới t, y
+    if F is None:                                    # mặc định: F(T) = I(T) - Q trên lưới t, y
         def F(T):
             return F_of_T(t, y, I, Q, T)
-    a, b = float(t[0]), float(t[-1])                # khoảng ban đầu: cả đoạn
+    a, b = float(t[0]), float(t[-1])                 # khoảng ban đầu: cả đoạn
     fa, fb = F(a), F(b)
-    if fb < 0.0:                                    # tới cuối đoạn vẫn chưa đủ Q -> vô nghiệm
-        raise ValueError("Q = %.6g lon hon tong tich phan %.6g: khong dat duoc" % (Q, fb + Q))
-    if fa >= 0.0:                                   # Q <= 0: đạt ngay tại mốc đầu
-        return {"T": a, "iters": 0, "width": 0.0, "residual": abs(fa), "a": a, "b": a}
-    it = 0                                          # đếm số vòng
-    while (b - a) > tol and it < max_iter:          # dừng khi khoảng đủ hẹp hoặc hết số vòng
-        m = (a + b) / 2.0                           # điểm giữa
+    if fb < 0.0:                                     # tới cuối đoạn vẫn chưa đủ Q -> vô nghiệm
+        raise ValueError("Q = %.6g lớn hơn tổng tích phân %.6g: không đạt được" % (Q, fb + Q))
+    if fa >= 0.0:                                    # Q <= 0: đạt ngay tại mốc đầu
+        return {"T": a, "T_giua": a, "iters": 0, "width": 0.0, "residual": fa, "F_giua": fa,
+                "a": a, "b": a}
+    it = 0
+    while (b - a) > tol / 2.0 and it < max_iter:     # thêm 1 vòng: dừng khi b - a <= tol/2
+        m = (a + b) / 2.0
         Fm = F(m)
-        if in_vong:                                 # in từng vòng để xem (chỉ dùng khi thử)
-            print("  vong %2d: a = %.6f  b = %.6f  m = %.6f  F(m) = %+.6f" % (it + 1, a, b, m, Fm))
+        if in_vong:
+            print("  vòng %2d: a = %.6f  b = %.6f  m = %.6f  F(m) = %+.6f" % (it + 1, a, b, m, Fm))
         if Fm >= 0.0:
-            b = m                                   # tại m đã đủ Q -> nghiệm ở nửa trái
+            b = m                                    # tại m đã đủ Q -> nghiệm ở nửa trái
         else:
-            a = m                                   # tại m chưa đủ Q -> nghiệm ở nửa phải
+            a = m                                    # tại m chưa đủ Q -> nghiệm ở nửa phải
         it += 1
-    T = (a + b) / 2.0                               # lấy khoang giữa làm T cuối cùng
-    return {"T": T, "iters": it, "width": b - a, "residual": abs(F(T)), "a": a, "b": b}
+    c = (a + b) / 2.0
+    return {"T": b, "T_giua": c, "iters": it, "width": b - a,
+            "residual": F(b),                        # F(b) >= 0: tải tại T đã chạm hoặc vượt Q
+            "F_giua": F(c), "a": a, "b": b}
+
+
+def bisect_diem_giua(t, y, I, Q, tol, max_iter):
+    # CÁCH CŨ (chỉ để so sánh): dừng khi b - a <= tol, lấy T = điểm giữa (a + b)/2.
+    # Gọi bisect với 2*tol -> dừng đúng lúc b - a <= tol (ít hơn cách mới 1 vòng).
+    r = bisect(t, y, I, Q, 2.0 * tol, max_iter)
+    return {"T": r["T_giua"], "iters": r["iters"], "width": r["width"], "residual": r["F_giua"]}
 
 
 def sci(x, nd=3):
@@ -214,49 +241,60 @@ def sci(x, nd=3):
 
 
 # Thử 3: nhập q -> tìm T bằng chia đôi
+
 def thu_chia_doi():
     cfg = load_config()
-    seg = input("Doan (A/B, Enter = A): ").strip().upper() or "A"
-    f = int(input("Muc lam thua f (1/2/4, Enter = 1): ").strip() or 1)
-    t, y = read_grid(grid_path(seg, "timestamps", f))           # lưới đang xét
+    seg = input("Đoạn (A/B, Enter = A): ").strip().upper() or "A"
+    f = int(input("Mức làm thưa f (1/2/4, Enter = 1): ").strip() or 1)
+    t, y = read_grid(grid_path(seg, "timestamps", f))
     check_grid(t, y)
     I = cumulative(t, y)
-    t1, y1 = read_grid(grid_path(seg, "timestamps", 1))         # lưới gốc f1
-    tot_goc = float(cumulative(t1, y1)[-1])                     # Q luôn chốt từ lưới gốc
-    print("Doan %s, f%d: T tu %.4f den %.4f phut | I_tot luoi nay = %.4f | I_tot goc f1 = %.4f"
+    t1, y1 = read_grid(grid_path(seg, "timestamps", 1))
+    tot_goc = float(cumulative(t1, y1)[-1])          # Q luôn chốt từ lưới gốc f1
+    print("Đoạn %s, f%d: T từ %.4f đến %.4f phút | I_tot lưới này = %.4f | I_tot gốc f1 = %.4f"
           % (seg, f, t[0], t[-1], I[-1], tot_goc))
     while True:
-        s = input("\nNhap q (0 < q <= 1, vd 0.5), Enter de thoat: ").strip()
+        s = input("\nNhập q (0 < q <= 1, ví dụ 0.5), Enter để thoát: ").strip()
         if s == "":
             break
         try:
             q = float(s)
         except ValueError:
-            print("  Hay nhap mot so.")
+            print("  Hãy nhập một số.")
             continue
         if not (0 < q <= 1):
-            print("  q phai nam trong (0, 1].")
+            print("  q phải nằm trong (0, 1].")
             continue
         Q = q * tot_goc
         if Q > I[-1]:
-            print("  Q = %.4f lon hon tong tren luoi f%d (%.4f): khong co nghiem." % (Q, f, I[-1]))
+            print("  Q = %.4f lớn hơn tổng trên lưới f%d (%.4f): không có nghiệm." % (Q, f, I[-1]))
             continue
         s = input("  Dung sai tol = 10^? (Enter = -6): ").strip()
         tol = 10.0 ** float(s or -6)
-        xem = input("  In tung vong? (c/k, Enter = k): ").strip().lower() == "c"
+        xem = input("  In từng vòng? (c/k, Enter = k): ").strip().lower() == "c"
         r = bisect(t, y, I, Q, tol, cfg["bisection"]["max_iter"], in_vong=xem)
-        print("  Q               = %.6f xe.phut" % Q)
-        print("  T (chia doi)    = %.9f phut  (khoang k = %d)" % (r["T"], locate(t, r["T"])))
-        print("  So vong         = %d" % r["iters"])
-        print("  Do rong khoang  = %s phut  (<= tol = %s)" % (sci(r["width"]), sci(tol, 0)))
-        print("  Residual |F(T)| = %s xe.phut" % sci(r["residual"]))
-        print("  I(T)            = %.6f xe.phut" % I_of_T(t, y, I, r["T"]))
+        g = bisect_diem_giua(t, y, I, Q, tol, cfg["bisection"]["max_iter"])
+        print("  Q = %.6f xe·phút\n" % Q)
+        print("  %-24s %-24s %-24s" % ("", "CÁCH MỚI: T = b", "CÁCH CŨ: T = điểm giữa"))
+        print("  %-24s %-24s %-24s" % ("Điều kiện dừng", "b − a <= tol/2", "b − a <= tol"))
+        print("  %-24s %-24s %-24s" % ("T (phút)", "%.9f" % r["T"], "%.9f" % g["T"]))
+        print("  %-24s %-24s %-24s" % ("Số vòng", r["iters"], g["iters"]))
+        print("  %-24s %-24s %-24s" % ("Độ rộng b − a (phút)", sci(r["width"]), sci(g["width"])))
+        print("  %-24s %-24s %-24s" % ("Cận sai số (phút)", "<= " + sci(r["width"]), "<= " + sci(g["width"] / 2)))
+        print("  %-24s %-24s %-24s" % ("F(T) = I(T) − Q", sci(r["residual"]), sci(g["residual"])))
+        kr, kg = locate(t, r["T"]), locate(t, g["T"])
+        print("  %-24s %-24s %-24s" % ("Khoảng k chứa T", kr, kg))
+        print("  %-24s %-24s %-24s" % ("t_k → t_k+1 (phút)", "%.4f → %.4f" % (t[kr], t[kr + 1]),
+                                       "%.4f → %.4f" % (t[kg], t[kg + 1])))
+        print("  %-24s %-24s %-24s" % ("Tải đã đạt Q?", "có" if r["residual"] >= 0 else "CHƯA",
+                                       "có" if g["residual"] >= 0 else "CHƯA"))
 
-# ==== Phần 4: khảo sát làm thưa lưới và dung sai ====================
+
+# ==== Phần 4: khảo sát làm thưa lưới và dung sai ===================
 # 4.1: Ba chỉ số sai số
 
 def metrics(errs):
-    # MAE: trung bình |e|; RMSE: √(trung bình của e²); E_inf: |e| lớn nhất
+    # MAE: trung bình |e|; RMSE: căn trung bình e^2; E_inf: |e| lớn nhất
     n = len(errs)
     mae = sum(abs(e) for e in errs) / n
     rmse = math.sqrt(sum(e * e for e in errs) / n)
@@ -269,29 +307,29 @@ def metrics(errs):
 def khao_sat_lam_thua(cfg, seg, kind="timestamps"):
     tol, mx = cfg["bisection"]["tol_minutes"], cfg["bisection"]["max_iter"]
     data = {}
-    for f in cfg["thin_factors"]:                           # đọc cả 3 lưới f1, f2, f4
+    for f in cfg["thin_factors"]:                    # đọc cả 3 lưới f1, f2, f4
         t, y = read_grid(grid_path(seg, kind, f))
         check_grid(t, y)
         data[f] = (t, y, cumulative(t, y))
     t1, y1, I1 = data[1]
-    Qs = q_levels(float(I1[-1]), cfg["q_fractions"])        # Q chốt từ lưới gốc f1
-    Tref = [bisect(t1, y1, I1, Q, tol, mx)["T"] for Q in Qs]   # T gốc: f1 với dung sai chính thức 1e-6
+    Qs = q_levels(float(I1[-1]), cfg["q_fractions"])    # Q chốt từ lưới gốc f1
+    Tref = [bisect(t1, y1, I1, Q, tol, mx)["T"] for Q in Qs]   # T gốc: f1, dung sai chính thức
     T_thua, sai_so = {}, {}
     for f in cfg["thin_factors"]:
         if f == 1:
-            continue                                        # f1 là mốc so sánh, bỏ qua
+            continue                                 # f1 là mốc so sánh
         t, y, I = data[f]
         Ts = []
         for Q in Qs:
-            if Q > I[-1]:                                   # lưới thưa không đạt được Q
+            if Q > I[-1]:                            # lưới thưa không đạt được Q
                 Ts.append(None)
             else:
-                Ts.append(bisect(t, y, I, Q, tol, mx)["T"])  # T trên lưới thưa, dung sai chính thức
+                Ts.append(bisect(t, y, I, Q, tol, mx)["T"])
         T_thua[f] = Ts
         if None not in Ts:
-            errs = [T - Tr for T, Tr in zip(Ts, Tref)]      # độ lệch so với T chuẩn (phút)
-            sai_so[f] = metrics(errs)                       # (MAE, RMSE, E_inf)
-    p = float("nan")                                        # chỉ báo bậc p = log2(E_f4 / E_f2)
+            errs = [T - Tr for T, Tr in zip(Ts, Tref)]   # độ lệch so với lưới gốc (phút)
+            sai_so[f] = metrics(errs)
+    p = float("nan")                                 # chỉ báo bậc p = log2(E_f4 / E_f2)
     if 2 in sai_so and 4 in sai_so and sai_so[2][2] > 0 and sai_so[4][2] > 0:
         p = math.log2(sai_so[4][2] / sai_so[2][2])
     return {"Qs": Qs, "Tref": Tref, "T_thua": T_thua, "sai_so": sai_so, "p": p}
@@ -307,8 +345,8 @@ def khao_sat_dung_sai(cfg, seg, kind="timestamps"):
     Qs = q_levels(float(I[-1]), cfg["q_fractions"])
     ket_qua = []
     for frac, Q in zip(cfg["q_fractions"], Qs):
-        Tref = bisect(t, y, I, Q, cfg["bisection"]["tol_minutes"], mx)["T"]   # T gốc: dung sai 1e-6
-        for tl in cfg["tol_study_minutes"]:                 # thử 1e-2, 1e-4, 1e-6, 1e-8
+        Tref = bisect(t, y, I, Q, cfg["bisection"]["tol_minutes"], mx)["T"]   # T ở dung sai chính thức
+        for tl in cfg["tol_study_minutes"]:          # thử các mức trong tol_study_minutes
             r = bisect(t, y, I, Q, tl, mx)
             ket_qua.append({"q": frac, "tol": tl, "iters": r["iters"], "T": r["T"],
                             "lech": abs(r["T"] - Tref), "residual": r["residual"]})
@@ -316,33 +354,38 @@ def khao_sat_dung_sai(cfg, seg, kind="timestamps"):
 
 
 # Thử 4: chọn đoạn -> xem kết quả hai khảo sát
+
 def thu_khao_sat():
     cfg = load_config()
-    seg = input("Doan (A/B, Enter = A): ").strip().upper() or "A"
+    seg = input("Đoạn (A/B, Enter = A): ").strip().upper() or "A"
     ls = khao_sat_lam_thua(cfg, seg)
-    print("\n(1) Lam thua luoi, doan %s (phut)" % seg)
+    print("\n(1) Làm thưa lưới, đoạn %s (phút)" % seg)
     for i, frac in enumerate(cfg["q_fractions"]):
         dong = "  q = %.2f: T_f1 = %.4f" % (frac, ls["Tref"][i])
         for f, Ts in ls["T_thua"].items():
-            dong += " | T_f%d = %s" % (f, "khong dat" if Ts[i] is None else "%.4f" % Ts[i])
+            dong += " | T_f%d = %s" % (f, "không đạt" if Ts[i] is None else "%.4f" % Ts[i])
         print(dong)
     for f, (mae, rmse, einf) in ls["sai_so"].items():
-        print("  f%d: MAE = %.4f  RMSE = %.4f  E_inf = %.4f" % (f, mae, rmse, einf))
-    print("  chi bao p = log2(E_f4 / E_f2) = %.3f (du lieu thuc co nhieu, chi tham khao)" % ls["p"])
-    print("\n(2) Dung sai chia doi, doan %s, luoi f1" % seg)
+        print("  f%d: MAE = %.4f  RMSE = %.4f  E∞ = %.4f" % (f, mae, rmse, einf))
+    print("  Chỉ báo p = log2(E_f4 / E_f2) = %.3f (dữ liệu thực có nhiễu, chỉ tham khảo)" % ls["p"])
+    print("\n(2) Dung sai chia đôi, đoạn %s, lưới f1" % seg)
     for r in khao_sat_dung_sai(cfg, seg):
-        print("  q = %.2f  tol = %-7g vong = %2d  |T - T_chuan| = %s phut" % (
+        print("  q = %.2f  tol = %-7g vòng = %2d  |T - T(tol chính thức)| = %s phút" % (
             r["q"], r["tol"], r["iters"], sci(r["lech"])))
 
-# ==== Phần 5: tổng hợp kết quả, ghi file, chạy chương trình ====
+
+# ==== Phần 5: tổng hợp kết quả, ghi file, chạy chương trình ========
 # 5.1: Lập các bảng kết quả cho cả A, B và ghi ra file CSV
 
 def write_csv(name, head, rows):
-    # Ghi bảng vào results/<name>: dòng đầu là tên cột, các dòng sau là số liệu
-    with open(results_dir() / name, "w", newline="", encoding="utf-8-sig") as fh:
-        w = csv.writer(fh)
-        w.writerow(head)
-        w.writerows(rows)
+    # Ghi bảng vào results/<name>. utf-8-sig để Excel hiện đúng tiếng Việt có dấu.
+    try:
+        with open(results_dir() / name, "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.writer(fh)
+            w.writerow(head)
+            w.writerows(rows)
+    except PermissionError:
+        raise SystemExit("Không ghi được results/%s: file đang mở (Excel?). Đóng file rồi chạy lại." % name)
 
 
 def lap_bang(cfg):
@@ -353,37 +396,44 @@ def lap_bang(cfg):
     for seg in cfg["segments"]:
         for kind in cfg["base_grids"]:
             Qs = None
-            for f in cfg["thin_factors"]:                       # (a) tích phân và (b) chia đôi
+            for f in cfg["thin_factors"]:            # (a) tích phân và (b) chia đôi
                 t, y = read_grid(grid_path(seg, kind, f))
                 check_grid(t, y)
                 I = cumulative(t, y)
                 total, cover = float(I[-1]), float(t[-1] - t[0])
                 if f == 1:
-                    Qs = q_levels(total, qs)                    # Q chốt từ lưới gốc f1
-                tp.append([seg, kind, "f%d" % f, len(t), "%.9f" % cover, "%.9f" % total,
+                    Qs = q_levels(total, qs)         # Q chốt từ lưới gốc f1
+                tp.append([seg, "f%d" % f, len(t), "%.9f" % cover, "%.9f" % total,
                            "%.9f" % (total / cover)] + ["%.9f" % Q for Q in Qs])
                 for frac, Q in zip(qs, Qs):
-                    r = bisect(t, y, I, Q, tol, mx)
-                    cd.append([seg, kind, "f%d" % f, "%d%%" % round(100 * frac), "%.9f" % Q,
-                               "%.9f" % r["T"], r["iters"], "%.3e" % r["width"],
-                               "%.3e" % r["residual"], "%.9f" % I_of_T(t, y, I, r["T"])])
-            k = khao_sat_lam_thua(cfg, seg, kind)               # (c) làm thưa lưới
+                    r = bisect(t, y, I, Q, tol, mx)              # cách mới: T = b
+                    g = bisect_diem_giua(t, y, I, Q, tol, mx)    # cách cũ: T = điểm giữa (so sánh)
+                    k = locate(t, r["T"])                         # khoảng k chứa nghiệm T = b
+                    cd.append([seg, "f%d" % f, "%d%%" % round(100 * frac), "%.9f" % Q, k,
+                               "%.4f → %.4f" % (t[k], t[k + 1]),
+                               "%.9f" % r["T"], r["iters"], "%.3e" % r["width"], "%.3e" % r["residual"],
+                               "%.9f" % g["T"], g["iters"], "%.3e" % g["width"], "%.3e" % g["residual"],
+                               "%.3e" % (r["T"] - g["T"])])
+            k = khao_sat_lam_thua(cfg, seg, kind)    # (c) làm thưa lưới
             for f, (mae, rmse, einf) in k["sai_so"].items():
-                ls.append([seg, kind, "f%d" % f, "%.4f" % mae, "%.4f" % rmse, "%.4f" % einf, ""])
-            ls.append([seg, kind, "chi_bao_p", "", "", "", "%.3f" % k["p"]])
-            for r in khao_sat_dung_sai(cfg, seg, kind):         # (d) dung sai
-                q_pt = "%d%%" % round(100 * r["q"])
-                ds.append([seg, kind, q_pt, "%g" % r["tol"], r["iters"], "%.9f" % r["T"],
-                           "%.3e" % r["lech"], "%.3e" % r["residual"]])
+                ls.append([seg, "f%d" % f, "%.4f" % mae, "%.4f" % rmse, "%.4f" % einf, ""])
+            ls.append([seg, "chỉ báo p", "", "", "", "%.3f" % k["p"]])
+            for r in khao_sat_dung_sai(cfg, seg, kind):   # (d) dung sai
+                ds.append([seg, "%d%%" % round(100 * r["q"]), "%g" % r["tol"], r["iters"],
+                           "%.9f" % r["T"], "%.3e" % r["lech"], "%.3e" % r["residual"]])
     return {
-        "integral_summary.csv": (["segment", "grid", "thin", "n_moc", "thoi_gian_phu_phut", "tong_I_xe_phut",
-                                  "trung_binh_xe"] + ["Q%d%%_xe_phut" % round(100 * q) for q in qs], tp),
-        "bisection_results.csv": (["segment", "grid", "thin", "Q_phan_tram", "Q_xe_phut", "T_phut_tu_dau_doan",
-                                   "so_vong", "do_rong_khoang_phut", "residual_xe_phut", "I(T)_xe_phut"], cd),
-        "sampling_summary.csv": (["segment", "grid", "thin", "MAE_phut", "RMSE_phut", "Einf_phut",
-                                  "chi_bao_p"], ls),
-        "tolerance_study.csv": (["segment", "grid", "Q_phan_tram", "tol_phut", "so_vong", "T_phut",
-                                 "|T - T(tol chinh thuc)|_phut", "residual_xe_phut"], ds),
+        "integral_summary.csv": (["Đoạn", "Lưới", "Số mốc", "Thời gian phủ (phút)", "Tổng tải I_tot (xe·phút)",
+                                  "Số xe trung bình theo thời gian (xe)"]
+                                 + ["Q %d%% (xe·phút)" % round(100 * q) for q in qs], tp),
+        "bisection_results.csv": (["Đoạn", "Lưới", "Mức q", "Q (xe·phút)", "Khoảng k chứa T",
+                                   "t_k → t_k+1 (phút)",
+                                   "[Mới] T = b (phút)", "[Mới] Số vòng", "[Mới] Độ rộng b − a (phút)",
+                                   "[Mới] Residual F(b) (xe·phút)",
+                                   "[Cũ] T = điểm giữa (phút)", "[Cũ] Số vòng", "[Cũ] Độ rộng b − a (phút)",
+                                   "[Cũ] Residual F(T giữa) (xe·phút)", "T mới − T cũ (phút)"], cd),
+        "sampling_summary.csv": (["Đoạn", "Lưới", "MAE (phút)", "RMSE (phút)", "E∞ (phút)", "Chỉ báo p"], ls),
+        "tolerance_study.csv": (["Đoạn", "Mức q", "tol (phút)", "Số vòng", "T (phút)",
+                                 "|T(tol) − T(tol chính thức)| (phút)", "Residual F(T) (xe·phút)"], ds),
     }
 
 
@@ -391,103 +441,105 @@ def ghi_ket_qua(bang):
     # Ghi từng bảng ra file CSV trong thư mục results
     for ten, (head, rows) in bang.items():
         write_csv(ten, head, rows)
-        print("Da ghi results/%s (%d dong)" % (ten, len(rows)))
+        print("Đã ghi results/%s (%d dòng)" % (ten, len(rows)))
 
-# 5.2: In ra terminal các bảng kết quả (tích phân, chia đôi, làm thưa, dung sai)
-#    cfg = load_config()                                                                                                                                        
-#    bang = lap_bang(cfg)                                                                                                                                       
-#    ghi_ket_qua(bang)
+
+# 5.2: In ra terminal các bảng kết quả và dòng so sánh hai nguồn biến động
 
 def in_bang(bang, cfg):
     tol = cfg["bisection"]["tol_minutes"]
     _, tp = bang["integral_summary.csv"]
-    print("\n== (1) TICH PHAN: tong tai moi luoi ==")
-    print("%-4s %-4s %5s %12s %14s %10s" % ("Doan", "Luoi", "Moc", "Phu(phut)", "I_tot(xe.ph)", "TB(xe)"))
+    print("\n== (1) TÍCH PHÂN: tổng tải mỗi lưới ==")
+    print("%-4s %-4s %5s %12s %14s %10s" % ("Đoạn", "Lưới", "Mốc", "Phủ (phút)", "I_tot (xe·ph)", "TB (xe)"))
     for r in tp:
-        print("%-4s %-4s %5s %12.4f %14.4f %10.4f" % (r[0], r[2], r[3], float(r[4]), float(r[5]), float(r[6])))
+        print("%-4s %-4s %5s %12.4f %14.4f %10.4f" % (r[0], r[1], r[2], float(r[3]), float(r[4]), float(r[5])))
 
     _, cd = bang["bisection_results.csv"]
-    print("\n== (2) CHIA DOI: thoi diem T (tol = %g phut) ==" % tol)
-    print("%-4s %-4s %-4s %12s %6s %12s" % ("Doan", "Luoi", "q", "T(phut)", "Vong", "Residual"))
+    print("\n== (2) CHIA ĐÔI (tol = %g phút) ==" % tol)
+    print("     Mới: T = b, dừng khi b − a <= tol/2   |   Cũ: T = điểm giữa, dừng khi b − a <= tol")
+    print("%-4s %-4s %-4s %4s | %13s %5s %10s %10s | %13s %5s %10s %10s" % (
+        "Đoạn", "Lưới", "q", "k", "T mới", "Vòng", "Độ rộng", "F(T)", "T cũ", "Vòng", "Độ rộng", "F(T)"))
     for r in cd:
-        print("%-4s %-4s %-4s %12.6f %6s %12s" % (r[0], r[2], r[3], float(r[5]), r[6], r[8]))
+        print("%-4s %-4s %-4s %4s | %13.6f %5s %10s %10s | %13.6f %5s %10s %10s" % (
+            r[0], r[1], r[2], r[4], float(r[6]), r[7], r[8], r[9], float(r[10]), r[11], r[12], r[13]))
 
     _, ls = bang["sampling_summary.csv"]
-    print("\n== (3) LAM THUA LUOI: do lech T so voi luoi goc f1 (phut) ==")
-    print("%-4s %-10s %9s %9s %9s %8s" % ("Doan", "Luoi", "MAE", "RMSE", "E_inf", "p"))
+    print("\n== (3) LÀM THƯA LƯỚI: độ lệch T so với lưới gốc f1 (phút) ==")
+    print("%-4s %-10s %9s %9s %9s %8s" % ("Đoạn", "Lưới", "MAE", "RMSE", "E∞", "p"))
     for r in ls:
-        print("%-4s %-10s %9s %9s %9s %8s" % (r[0], r[2], r[3], r[4], r[5], r[6]))
+        print("%-4s %-10s %9s %9s %9s %8s" % tuple(r))
 
     _, ds = bang["tolerance_study.csv"]
-    print("\n== (4) DUNG SAI: |T(tol) - T(%g)| tren luoi f1 (phut) ==" % tol)
-    print("%-4s %-4s %8s %6s %12s" % ("Doan", "q", "tol", "Vong", "Do lech"))
+    print("\n== (4) DUNG SAI: |T(tol) − T(%g)| trên lưới f1 (phút) ==" % tol)
+    print("%-4s %-4s %8s %6s %12s" % ("Đoạn", "q", "tol", "Vòng", "Độ lệch"))
     for r in ds:
-        print("%-4s %-4s %8s %6s %12s" % (r[0], r[2], r[3], r[4], r[6]))
+        print("%-4s %-4s %8s %6s %12s" % (r[0], r[1], r[2], r[3], r[5]))
 
     # So sánh: biến động lớn nhất do lấy mẫu với biến động do dung sai chính thức
-    lay_mau = max(float(r[5]) for r in ls if r[2] != "chi_bao_p")
-    min_hon = [float(r[6]) for r in ds if float(r[3]) < tol]       # các mức mịn hơn tol chính thức
+    lay_mau = max(float(r[4]) for r in ls if r[1] != "chỉ báo p")
+    min_hon = [float(r[5]) for r in ds if float(r[2]) < tol]       # các mức mịn hơn tol chính thức
     dung_sai = max(min_hon) if min_hon else tol / 2                 # không có thì dùng cận tol/2
-    print("\n== SO SANH (Buoc 5) ==")
-    print("Bien dong do LAY MAU (E_inf lon nhat)       = %.4f phut" % lay_mau)
-    print("Bien dong do DUNG SAI chinh thuc (tol = %g) = %s phut" % (tol, sci(dung_sai)))
+    print("\n== SO SÁNH (Bước 5) ==")
+    print("Biến động do LẤY MẪU (E∞ lớn nhất)         = %.4f phút" % lay_mau)
+    print("Biến động do DUNG SAI chính thức (tol = %g) = %s phút" % (tol, sci(dung_sai)))
     if lay_mau > 10 * dung_sai:
-        print("=> Bien dong do lay mau lon hon rat nhieu: do tin cay cua T bi gioi han boi mat do anh,")
-        print("   khong phai boi thuat toan chia doi.")
+        print("=> Biến động do lấy mẫu lớn hơn rất nhiều: độ tin cậy của T bị giới hạn bởi mật độ ảnh,")
+        print("   không phải bởi thuật toán chia đôi.")
     else:
-        print("=> Hai nguon bien dong cung bac, can xem them.")
-    print("Luu y: nhan la prelabel -> ket qua SO BO; chi bao p tren du lieu co nhieu chi de tham khao.")
+        print("=> Hai nguồn biến động cùng bậc, cần xem thêm.")
+    print("Lưu ý: nhãn là prelabel -> kết quả SƠ BỘ; chỉ báo p trên dữ liệu có nhiễu chỉ để tham khảo.")
+
 
 # 5.3: Menu tính riêng (gom các hàm thử của Phần 2-4)
 
 def menu():
     lua_chon = {
-        "1": ("Xem hinh thang cua khoang k", thu_tich_phan),
-        "2": ("Tinh tai tich luy I(T) tai T bat ky", thu_nhap),
-        "3": ("Tim T theo q bang chia doi", thu_chia_doi),
-        "4": ("Xem khao sat lam thua va dung sai cua mot doan", thu_khao_sat),
+        "1": ("Xem hình thang của khoảng k", thu_tich_phan),
+        "2": ("Tính tải tích lũy I(T) tại T bất kỳ", thu_nhap),
+        "3": ("Tìm T theo q bằng chia đôi", thu_chia_doi),
+        "4": ("Xem khảo sát làm thưa và dung sai của một đoạn", thu_khao_sat),
     }
     while True:
-        print("\n=== TINH RIENG (De 20) ===")
+        print("\n=== TÍNH RIÊNG (Đề 20) ===")
         for so, (ten, _) in lua_chon.items():
             print("%s) %s" % (so, ten))
-        print("0) Thoat")
-        c = input("Chon: ").strip()
+        print("0) Thoát")
+        c = input("Chọn: ").strip()
         if c == "0":
             break
         if c not in lua_chon:
-            print("Hay chon 0-%d." % len(lua_chon))
+            print("Hãy chọn 0-%d." % len(lua_chon))
             continue
         try:
-            lua_chon[c][1]()                        # gọi hàm thử tương ứng
-        except (ValueError, OSError) as e:          # nhập sai hoặc không có file lưới
-            print("Loi:", e)
+            lua_chon[c][1]()
+        except (ValueError, OSError) as e:           # nhập sai hoặc không có file lưới
+            print("Lỗi:", e)
+
 
 # 5.4: Chương trình chính
 
 def main():
-    ap = argparse.ArgumentParser(description="De 20: thoi diem dat chi so tai tich luy")
-    ap.add_argument("--het", action="store_true", help="chay het mo hinh, khong hoi")
-    ap.add_argument("--demo", action="store_true", help="mo menu tinh rieng, khong hoi")
+    ap = argparse.ArgumentParser(description="Đề 20: thời điểm đạt chỉ số tải tích lũy")
+    ap.add_argument("--het", action="store_true", help="chạy hết mô hình, không hỏi")
+    ap.add_argument("--demo", action="store_true", help="mở menu tính riêng, không hỏi")
     args = ap.parse_args()
     cfg = load_config()
     if args.het:
         c = "1"
     elif args.demo:
         c = "2"
-    else:                               # bấm ▷ hoặc chạy không kèm gì -> hỏi
-        print("=== DE 20 ===\n1) Chay het mo hinh (ghi file + in ket qua)\n2) Tinh rieng (menu thu)"
-              "\n3) Kiem chung y = 1 + t\n0) Thoat")
-        c = input("Chon: ").strip()
+    else:                                            # bấm ▷ hoặc chạy không kèm gì -> hỏi
+        print("=== ĐỀ 20 ===\n1) Chạy hết mô hình (ghi file + in kết quả)\n2) Tính riêng (menu thử)"
+              "\n3) Kiểm chứng y = 1 + t\n0) Thoát")
+        c = input("Chọn: ").strip()
     if c == "1":
-        bang = lap_bang(cfg)            # tính cho A, B
-        ghi_ket_qua(bang)               # ghi 4 file CSV
-        in_bang(bang, cfg)              # in bảng và dòng so sánh
+        bang = lap_bang(cfg)
+        ghi_ket_qua(bang)
+        in_bang(bang, cfg)
     elif c == "2":
         menu()
     elif c == "3":
-        import sys
-        sys.path.insert(0, str(ROOT / "src"))           # cho Python tìm thấy kiem_chung.py trong src
+        sys.path.insert(0, str(ROOT / "src"))        # cho Python tìm thấy kiem_chung.py trong src
         from kiem_chung import kiem_chung, kiem_chung_lam_thua   # chỉ nạp khi chọn mục này
         kiem_chung(cfg)
         kiem_chung_lam_thua(cfg)

@@ -1,0 +1,7 @@
+﻿Đoạn,Mức q,Số vòng (tỉ lệ q),Fallback (tỉ lệ q),Số vòng (giữa đoạn),Fallback (giữa đoạn),Số vòng (đầu mút b),Fallback (đầu mút b),Số vòng (đầu mút a),Fallback (đầu mút a)
+A,25%,5,0,5,0,10,0,7,0
+A,50%,6,0,6,0,9,0,7,1
+A,75%,7,0,12,1,8,0,13,2
+B,25%,2,0,3,1,4,0,5,0
+B,50%,2,0,2,0,4,0,6,0
+B,75%,5,0,6,1,8,0,9,1

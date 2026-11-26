@@ -1,9 +1,10 @@
-"""Vẽ đồ thị (Đề 20): đọc lưới trong data/ và kết quả trong results/, lưu hình PNG vào figures/.
+"""Vẽ đồ thị (Đề 20): đọc lưới trong data/ và kết quả trong results/, lưu hình PNG vào results/.
 
 Hình 1: tải tích lũy và giao mức Q (sản phẩm bắt buộc của đề)
 Hình 2: kiểm chứng y = 1 + t, sai số theo dung sai (Bước 4)
 Hình 3: biến động của T do lấy mẫu so với do dung sai (Bước 5)
 Cần chạy mo_hinh.py (mục 1) và kiem_chung.py trước.
+Chạy: python src\\ve_do_thi.py
 """
 import csv
 
@@ -36,13 +37,13 @@ def doc_csv(name):
 
 
 def luu(fig, ten):
-    # Lưu hình vào figures/ (tự tạo thư mục nếu chưa có)
-    d = ROOT / "figures"
+    # Lưu hình vào results/ (tự tạo thư mục nếu chưa có)
+    d = ROOT / "results"
     d.mkdir(exist_ok=True)
     fig.tight_layout()
     fig.savefig(d / ten, dpi=200)
     plt.close(fig)
-    print("Da luu figures/%s" % ten)
+    print("Đã lưu results/%s" % ten)
 
 
 # Hình 1: số xe ỹ(t) và tải tích lũy I(t), giao mức Q tại T (lưới gốc f1)
@@ -62,7 +63,7 @@ def hinh_tai_tich_luy(cfg):
         ax = axs[1, j]                                           # hàng dưới: tải tích lũy và giao mức
         ax.plot(t, I, color=MAU[1], linewidth=2)
         for frac, Q in zip(cfg["q_fractions"], q_levels(float(I[-1]), cfg["q_fractions"])):
-            T = bisect(t, y, I, Q, tol, mx)["T"]
+            T = bisect(t, y, I, Q, tol, mx)["T"]                    # T = b: tải đã chạm Q
             ax.plot([t[0], T], [Q, Q], color=CHU_PHU, linewidth=1, linestyle="--")   # mức Q
             ax.plot([T, T], [0, Q], color=CHU_PHU, linewidth=1, linestyle="--")      # thời điểm T
             ax.plot([T], [Q], marker="o", markersize=8, color=MAU[1], markeredgecolor="white", markeredgewidth=1.5)
@@ -79,13 +80,13 @@ def hinh_tai_tich_luy(cfg):
 
 # Hình 2: kiểm chứng y = 1 + t, sai số lớn nhất theo dung sai (thang log)
 def hinh_kiem_chung():
-    rows = [r for r in doc_csv("verify_linear.csv") if r["Q_xe_phut"] == "tong_hop"]   # chỉ lấy dòng tổng hợp
-    tol = [float(r["tol_phut"]) for r in rows]
-    einf = [float(r["Einf_phut"]) for r in rows]
+    rows = [r for r in doc_csv("verify_linear.csv") if r["Q (xe·phút)"].startswith("tổng hợp")]   # chỉ lấy dòng tổng hợp
+    tol = [float(r["tol (phút)"]) for r in rows]
+    einf = [float(r["E∞ (phút)"]) for r in rows]
     fig, ax = plt.subplots(figsize=(6, 4.5))
-    ax.plot(tol, [x / 2 for x in tol], color=CHU_PHU, linestyle="--", linewidth=1, label="Cận lý thuyết tol/2")
+    ax.plot(tol, [x / 2 for x in tol], color=CHU_PHU, linestyle="--", linewidth=1, label="Cận lý thuyết tol/2 (dừng khi b − a ≤ tol/2)")
     ax.plot(tol, einf, color=MAU[1], linewidth=2, marker="o", markersize=8, markeredgecolor="white",
-            markeredgewidth=1.5, label="E∞ = max |T − T*|")
+            markeredgewidth=1.5, label="E∞ = max |T − T*|, T = b")
     for x, e in zip(tol, einf):
         ax.annotate("%.1e" % e, (x, e), xytext=(6, 6), textcoords="offset points", fontsize=9, color=CHU)
     ax.set_xscale("log")
@@ -102,16 +103,16 @@ def hinh_kiem_chung():
 # Hình 3: biến động lớn nhất của T do làm thưa lưới và do dung sai (thang log)
 def hinh_so_sanh(cfg):
     tol = cfg["bisection"]["tol_minutes"]
-    ls = [r for r in doc_csv("sampling_summary.csv") if r["thin"] != "chi_bao_p"]
-    ds = [r for r in doc_csv("tolerance_study.csv") if float(r["tol_phut"]) < tol]   # mức mịn hơn tol
+    ls = [r for r in doc_csv("sampling_summary.csv") if r["Lưới"] != "chỉ báo p"]
+    ds = [r for r in doc_csv("tolerance_study.csv") if float(r["tol (phút)"]) < tol]   # mức mịn hơn tol
     nhan, gia_tri, mau = [], [], []
     for seg in cfg["segments"]:
         for r in ls:
-            if r["segment"] == seg:
-                nhan.append("%s · làm thưa %s" % (seg, r["thin"]))
-                gia_tri.append(float(r["Einf_phut"]))
-                mau.append(MAU[int(r["thin"][1:])])
-        lech = [float(r["|T - T(tol chinh thuc)|_phut"]) for r in ds if r["segment"] == seg]
+            if r["Đoạn"] == seg:
+                nhan.append("%s · làm thưa %s" % (seg, r["Lưới"]))
+                gia_tri.append(float(r["E∞ (phút)"]))
+                mau.append(MAU[int(r["Lưới"][1:])])
+        lech = [float(r["|T(tol) − T(tol chính thức)| (phút)"]) for r in ds if r["Đoạn"] == seg]
         if lech:
             nhan.append("%s · dung sai %g" % (seg, tol))
             gia_tri.append(max(lech))
@@ -138,8 +139,6 @@ def main():
     hinh_tai_tich_luy(cfg)
     hinh_kiem_chung()
     hinh_so_sanh(cfg)
-    import os
-    os.startfile(ROOT / "figures")      # Windows: mở thư mục figures sau khi vẽ xong
 
 
 if __name__ == "__main__":
